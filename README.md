@@ -1,5 +1,4 @@
-# network
-Web scraping tools repo
+# other tools
 
 (Disclaimer)
 Author is not responsible for any damages caused by the use of these programs.
