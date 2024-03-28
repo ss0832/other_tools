@@ -9,3 +9,4 @@ file_scraper.py: This is web scraper to download image data. Current websites us
 
 secure_deleter.py: This is a program that make files unrecoverable and delete.
 
+xyz2GRRMcom.py: For making GRRM input files (convert .xyz file to .com file)
