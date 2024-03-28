@@ -15,7 +15,7 @@ def parser():
     parser.add_argument("-func", "--functional",  type=str, default='wB97XD', help='functional for DFT (ex.) wB97XD(default), B3LYP')
     parser.add_argument("-b", "--basisset",  type=str, default='def2SVP', help='basis set (after typing basis set and space, you can spcify SCRF=(SMD,Solvent=water), Empricaldispersion=GD3, Int(Grid=Fine) etc.) (ex.) def2SVP(default), 6-31G(d), STO-3G, "def2SVP SCRF=(SMD,Solvent=water)", ')
     parser.add_argument("-c", "--charge",  type=str, default='0', help='charge')
-    parser.add_argument("-s", "--spin",  type=str, default='1', help='bspin multiply')
+    parser.add_argument("-s", "--spin",  type=str, default='1', help='spin multiply')
     parser.add_argument('-t','--theory',  type=str, default='MIN', help='MIN SADDLE LUP etc.')
     parser.add_argument('-nf','--nofolder', help="dont make folder.", action='store_true')
     parser.add_argument('-sf','--samefolder', type=str,nargs="?",help="save same folder.")
@@ -23,7 +23,9 @@ def parser():
     parser.add_argument("-o","--options", help="options (ex.) -o NOFC MaxOPTITR=0 MinFreqValue=50 DontKeepGauCHK Gaumem=100 Gauproc=1 (default) Gaumem=1500 GauProc=16 MinFreqValue=50.0 EigenCheck DontKeepGauCHK DownDC=50", nargs="*", default=["Gaumem=1500", "GauProc=16", "MinFreqValue=50.0", "EigenCheck", "DontKeepGauCHK", "DownDC=50"])
     parser.add_argument("-ma", "--manual_AFIR", nargs="*",  type=str, default=None, help='manual-AFIR (ex.) [[Whole gamma(kJ/mol)] [Gamma(kJ/mol) (If you do not want to write anything, just type "None".)] [Fragm.1(ex. 1,2,3-5)] [Fragm.2] ...]')
     parser.add_argument("-kp", "--keep_pot", nargs="*",  type=str, default=None, help='keep potential 0.5*k*(r - r0)^2 (ex.) [[spring const.(a.u.)] [keep distance (ang.)] [atom1,atom2] ...] ')
-    parser.add_argument("-ta", "--target")
+    parser.add_argument("-ta", "--target",  type=str, default=None, help="target atoms for AFIR method")
+    parser.add_argument("-l", "--link",  type=str, default=None, help=r"%link=xxx")
+
     args = parser.parse_args()
 
     for i in range(len(args.options)):
@@ -160,6 +162,8 @@ class xyz2GRRMcom:
                 AFIR_input_list.append(str(2*i+1)+" "+str(2*i+2)+"  "+self.force_data["gamma_list"][i])
             else:
                 AFIR_input_list.append(str(2*i+1)+" "+str(2*i+2)+"  ")
+        if self.args.target is not None:
+            AFIR_input_list.append("target="+self.args.target)
         AFIR_input_list.append("END")
         return AFIR_input_list
     
@@ -177,6 +181,9 @@ class xyz2GRRMcom:
 
             
         with open(str(os.path.basename(file)[:-4])+".com","w") as f2:
+            if self.args.link is not None:
+                f2.write(r"%link="+self.args.link+"\n")
+
             f2.write("# "+self.args.theory+"/"+self.args.functional+"/"+self.args.basisset)
             f2.write("\n\n"+self.args.charge+" "+self.args.spin+"\n")
             for word in words[2:]:
